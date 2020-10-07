@@ -9,33 +9,44 @@ let standardColor = 'white';
 let minColor = 'red';
 let sortedColor = 'lightgreen';
 let pointerI = 0;
-let pointerJ = 1;
-let min = pointerI;
+let pointerJ;
+let min;
+let selectedSort, selectedOrder;
 let fps = 5;
-let radio, button;
+let radioOrder, radioSort, startButton;
 
 let arrayIsBuilt = false;
 
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
     background(220);
-    radio = createRadio();
-    radio.option(1, 'random');
-    radio.option(2, 'in ascending order');
-    radio.option(3, 'in descending order');
-    button = createButton('get to sorting!');
+
+    radioOrder = createRadio('order');
+    radioOrder.option("rnd", 'in random order');
+    radioOrder.option("asc", 'in ascending order');
+    radioOrder.option("des", 'in descending order');
+    selectedOrder = radioOrder.value();
+
+    radioSort = createRadio('sort');
+    radioSort.option("sel", 'Selection Sort');
+    radioSort.option("ins", 'Insertion Sort');
+    selectedSort = radioSort.value();
+
+    startButton = createButton('get to sorting!');
     frameRate(fps);
     textSize(20);
-    button.mousePressed(initArray);
+    startButton.mousePressed(initArray);
 }
 
 function initArray() {
-    let value = radio.value();
-    if (value === "1") {
+    selectedSort = radioSort.value();
+    selectedOrder = radioOrder.value();
+    if (selectedSort === "" || selectedOrder === "") return;
+    if (selectedOrder === "rnd") {
         for (let i = 0; i < numberOfBars; i++) {
             ary[i] = new Bar(Math.floor(Math.random() * canvasHeight / 2) + minimumBarHeight, barWidth, canvasHeight - 30);
         }
-    } else if (value === "2") {
+    } else if (selectedOrder === "asc") {
         for (let i = 0; i < numberOfBars; i++) {
             ary[i] = new Bar(i * canvasHeight / (2 * numberOfBars) + minimumBarHeight, barWidth, canvasHeight - 30)
         }
@@ -44,19 +55,21 @@ function initArray() {
             ary[i] = new Bar((numberOfBars - i) * canvasHeight / (2 * numberOfBars) + minimumBarHeight, barWidth, canvasHeight - 30)
         }
     }
+    if (selectedSort === "sel") {
+        pointerJ = 1;
+        min = pointerI;
+    } else {
+        pointerJ = 0;
+        min = pointerI;
+    }
 
-    radio.disable();
+    radioOrder.disable();
+    radioSort.disable();
+    startButton.attribute('disabled', '');
     loop();
 }
 
-function draw() {
-    if (radio.value() === "") {
-        noLoop();
-        return;
-    }
-    background(220)
-    redrawAry();
-    drawLegend();
+function selectionSort() {
     if (pointerI >= ary.length - 1) {
         noLoop();
         return;
@@ -74,6 +87,43 @@ function draw() {
     }
 }
 
+function insertionSort() {
+
+    if (pointerI >= ary.length) {
+        noLoop();
+        return;
+    } else {
+        if (pointerJ > 0 && ary[pointerJ].height <= ary[pointerJ - 1].height) {
+            exchange(pointerJ, pointerJ - 1);
+            pointerJ--;
+        } else {
+            pointerI++;
+            pointerJ = pointerI;
+        }
+        min = pointerJ;
+    }
+}
+
+function draw() {
+    if (selectedOrder === "" || selectedSort === "") {
+        noLoop();
+        return;
+    }
+    background(220)
+    let value = radioSort.value();
+    if (radioSort.value() === "sel") {
+        redrawAry();
+        drawLegend();
+        selectionSort();
+    } else {
+        redrawAry();
+        drawLegend();
+        insertionSort();
+    }
+
+
+}
+
 function drawLegend() {
     fill('white');
     rect(20, 20, 160, 100);
@@ -84,7 +134,11 @@ function drawLegend() {
     rect(30, 60, 20, 20);
     fill('black');
     text('sorted', 60, 46);
-    text('min = ' + min, 60, 76);
+    if (selectedSort === "sel") {
+        text('min = ' + min, 60, 76);
+    } else {
+        text('current = ' + min, 60, 76);
+    }
     text('unseen', 60, 106);
 }
 
@@ -104,12 +158,16 @@ function redrawAry() {
     for (let i = 0; i < numberOfBars; i++) {
         text(i, i * barWidth + barWidth / 4, canvasHeight - 5);
     }
-    text('i', pointerI * barWidth + barWidth / 2, ary[pointerI].y - ary[pointerI].height - 40);
+    if (pointerI < ary.length) {
+        text('i', pointerI * barWidth + barWidth / 2, ary[pointerI].y - ary[pointerI].height - 40);
+    } else {
+        text('i', pointerI * barWidth + barWidth / 2, ary[pointerI - 1].y - ary[pointerI - 1].height - 40);
+    }
     if (pointerJ < ary.length) {
         text('j', pointerJ * barWidth + barWidth / 2, ary[pointerJ].y - ary[pointerJ].height - 20);
     } else {
-        text('j', pointerJ * barWidth + barWidth / 2, ary[pointerI].y - ary[pointerI].height - 20);
-        ary[pointerI].draw(sortedColor, pointerI);
+        text('j', pointerJ * barWidth + barWidth / 2, ary[pointerJ - 1].y - ary[pointerJ - 1].height - 20);
+        ary[pointerJ - 1].draw(sortedColor, pointerJ - 1);
     }
 
 }
