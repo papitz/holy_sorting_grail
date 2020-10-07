@@ -1,9 +1,9 @@
 let ary = [];
-let canvasHeight = 500;
-let canvasWidth = 700;
+let canvasHeight;
+let canvasWidth;
 let barWidth = 35;
 let minimumBarHeight = 10;
-let numberOfBars = (canvasWidth - barWidth) / barWidth;
+let numberOfBars = 15;
 
 let standardColor = 'white';
 let minColor = 'red';
@@ -12,7 +12,7 @@ let pointerI = 0;
 let pointerJ;
 let min;
 let selectedSort, selectedOrder;
-let fps = 5;
+let fps = 4;
 let radioOrder, radioSort, startButton;
 
 let arrayIsBuilt = false;
@@ -20,6 +20,10 @@ let arrayIsBuilt = false;
 let statsCompares = 0, statsExchanges = 0;
 
 function setup() {
+    canvasWidth = windowWidth;
+    canvasHeight = windowHeight-100;
+    barWidth = (canvasWidth) / (numberOfBars+1);
+
     createCanvas(canvasWidth, canvasHeight);
     background(220);
 
@@ -37,7 +41,7 @@ function setup() {
 
     startButton = createButton('get to sorting!');
     frameRate(fps);
-    textSize(20);
+    textSize(15);
     startButton.mousePressed(initArray);
 }
 
@@ -126,32 +130,29 @@ function insertionSort() {
 }
 
 function drawLegend() {
-   //Legend:
+    //Legend:
     fill('white');
-    rect(20, 20, 160, 100);
-    rect(30, 90, 20, 20);
+    rect(20, 10, 160, 160);
+    rect(30, 80, 20, 20);
     fill('lightgreen')
-    rect(30, 30, 20, 20);
+    rect(30, 20, 20, 20);
     fill('red')
-    rect(30, 60, 20, 20);
+    rect(30, 50, 20, 20);
     fill('black');
-    text('sorted', 60, 46);
+    text('sorted', 60, 34);
     if (selectedSort === "sel") {
-        text('min = ' + min, 60, 76);
+        text('min = ' + min, 60, 64);
     } else {
-        text('current = ' + min, 60, 76);
+        text('current = ' + min, 60, 64);
     }
-    text('unseen', 60, 106);
-
-    //stats:
-    fill('white');
-    rect(canvasWidth-290, 20, 270, 100);
-    fill('black');
-    textAlign(CENTER);
-    text('Stats:', canvasWidth-150, 46);
+    text('unseen', 60, 94);
+    line(20,107,180,107);
     textAlign(LEFT);
-    text('number of compares  = ' + statsCompares, canvasWidth-280, 76);
-    text('number of exchanges = ' + statsExchanges, canvasWidth-280, 106);
+    text(statsCompares + ' compares' , 30, 124);
+    text(statsExchanges +' exchanges' , 30, 154);
+
+
+
 }
 
 function redrawAry() {
@@ -167,9 +168,11 @@ function redrawAry() {
         }
     }
     fill('black')
+    textAlign(CENTER);
     for (let i = 0; i < numberOfBars; i++) {
-        text(i, i * barWidth + barWidth / 4, canvasHeight - 5);
+        text(i, i * barWidth + barWidth / 2, canvasHeight - 5);
     }
+    textAlign(LEFT);
     if (pointerI < ary.length) {
         text('i', pointerI * barWidth + barWidth / 2, ary[pointerI].y - ary[pointerI].height - 40);
     } else {
@@ -188,4 +191,16 @@ function exchange(i, min) {
     ary[i] = ary[min];
     ary[min] = swappo;
     statsExchanges++;
+}
+class Bar{
+    constructor(height, width, y) {
+        this.height = height;
+        this.width = width;
+        this.y = y;
+    }
+
+    draw(color, placeInArray){
+        fill(color);
+        rect(placeInArray * this.width, this.y, this.width, -this.height); //start upper left corner
+    }
 }
