@@ -17,20 +17,23 @@ let radioOrder, radioSort, startButton;
 
 let arrayIsBuilt = false;
 
+let statsCompares = 0, statsExchanges = 0;
+
 function setup() {
     createCanvas(canvasWidth, canvasHeight);
     background(220);
-
-    radioOrder = createRadio('order');
-    radioOrder.option("rnd", 'in random order');
-    radioOrder.option("asc", 'in ascending order');
-    radioOrder.option("des", 'in descending order');
-    selectedOrder = radioOrder.value();
 
     radioSort = createRadio('sort');
     radioSort.option("sel", 'Selection Sort');
     radioSort.option("ins", 'Insertion Sort');
     selectedSort = radioSort.value();
+
+    radioOrder = createRadio('order');
+    radioOrder.option("rnd", 'in random order');
+    radioOrder.option("asc", 'in ascending order');
+    radioOrder.option("des", 'in descending order');
+
+    selectedOrder = radioOrder.value();
 
     startButton = createButton('get to sorting!');
     frameRate(fps);
@@ -69,6 +72,23 @@ function initArray() {
     loop();
 }
 
+function draw() {
+    if (selectedOrder === "" || selectedSort === "") {
+        noLoop();
+        return;
+    }
+    background(220)
+    if (radioSort.value() === "sel") {
+        redrawAry();
+        drawLegend();
+        selectionSort();
+    } else {
+        redrawAry();
+        drawLegend();
+        insertionSort();
+    }
+}
+
 function selectionSort() {
     if (pointerI >= ary.length - 1) {
         noLoop();
@@ -77,6 +97,7 @@ function selectionSort() {
         if (ary[pointerJ].height <= ary[min].height) {
             min = pointerJ;
         }
+        statsCompares++;
         pointerJ++;
     }
     if (pointerJ >= ary.length) {
@@ -88,7 +109,6 @@ function selectionSort() {
 }
 
 function insertionSort() {
-
     if (pointerI >= ary.length) {
         noLoop();
         return;
@@ -100,31 +120,13 @@ function insertionSort() {
             pointerI++;
             pointerJ = pointerI;
         }
+        statsCompares++;
         min = pointerJ;
     }
 }
 
-function draw() {
-    if (selectedOrder === "" || selectedSort === "") {
-        noLoop();
-        return;
-    }
-    background(220)
-    let value = radioSort.value();
-    if (radioSort.value() === "sel") {
-        redrawAry();
-        drawLegend();
-        selectionSort();
-    } else {
-        redrawAry();
-        drawLegend();
-        insertionSort();
-    }
-
-
-}
-
 function drawLegend() {
+   //Legend:
     fill('white');
     rect(20, 20, 160, 100);
     rect(30, 90, 20, 20);
@@ -140,6 +142,16 @@ function drawLegend() {
         text('current = ' + min, 60, 76);
     }
     text('unseen', 60, 106);
+
+    //stats:
+    fill('white');
+    rect(canvasWidth-290, 20, 270, 100);
+    fill('black');
+    textAlign(CENTER);
+    text('Stats:', canvasWidth-150, 46);
+    textAlign(LEFT);
+    text('number of compares  = ' + statsCompares, canvasWidth-280, 76);
+    text('number of exchanges = ' + statsExchanges, canvasWidth-280, 106);
 }
 
 function redrawAry() {
@@ -169,11 +181,11 @@ function redrawAry() {
         text('j', pointerJ * barWidth + barWidth / 2, ary[pointerJ - 1].y - ary[pointerJ - 1].height - 20);
         ary[pointerJ - 1].draw(sortedColor, pointerJ - 1);
     }
-
 }
 
 function exchange(i, min) {
     let swappo = ary[i];
     ary[i] = ary[min];
     ary[min] = swappo;
+    statsExchanges++;
 }
