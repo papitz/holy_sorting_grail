@@ -29,6 +29,7 @@ function setup() {
 
     radioSort = createRadio('sort');
     radioSort.option("sel", 'Selection Sort');
+    selectedSort = radioSort.selected("sel");
     radioSort.option("ins", 'Insertion Sort');
     selectedSort = radioSort.value();
 
@@ -173,6 +174,7 @@ function redrawAry() {
         text(i, i * barWidth + barWidth / 2, canvasHeight - 5);
     }
     textAlign(LEFT);
+    textSize(25);
     if (pointerI < ary.length) {
         text('i', pointerI * barWidth + barWidth / 2, ary[pointerI].y - ary[pointerI].height - 40);
     } else {
@@ -184,6 +186,7 @@ function redrawAry() {
         text('j', pointerJ * barWidth + barWidth / 2, ary[pointerJ - 1].y - ary[pointerJ - 1].height - 20);
         ary[pointerJ - 1].draw(sortedColor, pointerJ - 1);
     }
+    textSize(15);
 }
 
 function exchange(i, min) {
