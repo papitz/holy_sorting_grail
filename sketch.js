@@ -13,7 +13,7 @@ let pointerJ;
 let min;
 let selectedSort, selectedOrder;
 let fps = 4;
-let radioOrder, radioSort, startButton;
+let radioOrder, radioSort, startButton, restartButton;
 
 let arrayIsBuilt = false;
 
@@ -21,18 +21,26 @@ let statsCompares = 0, statsExchanges = 0;
 
 function setup() {
     canvasWidth = windowWidth;
-    canvasHeight = windowHeight-100;
-    barWidth = (canvasWidth) / (numberOfBars+1);
+    canvasHeight = windowHeight - 100;
+    barWidth = (canvasWidth) / (numberOfBars + 1);
 
     createCanvas(canvasWidth, canvasHeight);
     background(220);
 
+    //Headline:
+    textAlign(CENTER);
+    textSize(25);
+    text('Elementary Sorts', canvasWidth / 2, 25);
+    textSize(15)
+
+    //Radios Select Sorting Method
     radioSort = createRadio('sort');
     radioSort.option("sel", 'Selection Sort');
     selectedSort = radioSort.selected("sel");
     radioSort.option("ins", 'Insertion Sort');
     selectedSort = radioSort.value();
 
+    //Radios Select initial order of Input
     radioOrder = createRadio('order');
     radioOrder.option("rnd", 'in random order');
     radioOrder.option("asc", 'in ascending order');
@@ -40,10 +48,17 @@ function setup() {
 
     selectedOrder = radioOrder.value();
 
+    //sort/restart button
     startButton = createButton('get to sorting!');
+    restartButton = createButton('Restart')
     frameRate(fps);
     textSize(15);
     startButton.mousePressed(initArray);
+    restartButton.mousePressed(reloadPage);
+}
+
+function reloadPage() {
+    location.reload();
 }
 
 function initArray() {
@@ -147,11 +162,10 @@ function drawLegend() {
         text('current = ' + min, 60, 64);
     }
     text('unseen', 60, 94);
-    line(20,107,180,107);
+    line(20, 107, 180, 107);
     textAlign(LEFT);
-    text(statsCompares + ' compares' , 30, 124);
-    text(statsExchanges +' exchanges' , 30, 154);
-
+    text(statsCompares + ' compares', 32, 128);
+    text(statsExchanges + ' exchanges', 32, 154);
 
 
 }
@@ -195,14 +209,15 @@ function exchange(i, min) {
     ary[min] = swappo;
     statsExchanges++;
 }
-class Bar{
+
+class Bar {
     constructor(height, width, y) {
         this.height = height;
         this.width = width;
         this.y = y;
     }
 
-    draw(color, placeInArray){
+    draw(color, placeInArray) {
         fill(color);
         rect(placeInArray * this.width, this.y, this.width, -this.height); //start upper left corner
     }
